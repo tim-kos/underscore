@@ -897,6 +897,11 @@
     return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
   };
 
+  // Creates a value only clone of an object ignoring functions.
+  _.valueClone = function(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  };
+
   // Invokes interceptor with the obj, and then returns obj.
   // The primary purpose of this method is to "tap into" a method chain, in
   // order to perform operations on intermediate results within the chain.
