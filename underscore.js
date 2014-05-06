@@ -840,14 +840,52 @@
   };
 
   // Extend a given object with all the properties in passed-in object(s).
-  _.extend = function(obj) {
-    if (!_.isObject(obj)) return obj;
-    _.each(slice.call(arguments, 1), function(source) {
-      for (var prop in source) {
-        obj[prop] = source[prop];
+  _.extend = function(recursive) {
+    var args = Array.prototype.slice.call(arguments);
+    var a    = args.shift();
+    var b;
+
+    if (recursive === true) {
+      a = args.shift();
+    } else {
+      recursive = false;
+    }
+
+    while (args.length) {
+      b = args.shift();
+
+      if (!b) {
+        continue;
       }
-    });
-    return obj;
+
+      if (_.isObject(b) && !_.isArray(b)) {
+        Object.keys(b).forEach(function(key) {
+          var val = b[key];
+
+          if ( !recursive ||
+            (!_.isObject(a[key]) && !_.isArray(a[key])) ||
+            (!_.isArray(val) && !_.isObject(val))
+          ) {
+            a[key] = val;
+            return;
+          }
+
+          _.extend(true, a[key], val);
+        });
+        continue;
+      }
+
+      if (!_.isArray(a) || !_.isArray(b)) {
+        // We cannot merge an array into something that is not
+        return;
+      }
+
+      b.forEach(function(val) {
+        a.push(val);
+      });
+    }
+
+    return a;
   };
 
   // Return a copy of the object only containing the whitelisted properties.
